@@ -1,50 +1,43 @@
-@extends('layouts.public')
+<x-layouts.public title="{{ data_get($sekolah, 'nama') }} - Sekolah Keagamaan">
+    <x-public.page-hero eyebrow="Detail Sekolah Keagamaan" title="{{ data_get($sekolah, 'nama') }}" subtitle="{{ data_get($sekolah, 'jenis') }} di {{ data_get($sekolah, 'kecamatan.nama', 'Kabupaten Kepulauan Sangihe') }}" />
 
-@section('content')
-<x-public.page-hero
-    :title="$sekolah->nama"
-    subtitle="Informasi pendidikan keagamaan yang telah dipublikasikan untuk masyarakat."
-/>
+    @php
+        $image = \App\Http\Controllers\PublicPageController::publicImage(data_get($sekolah, 'foto') ?? data_get($sekolah, 'gambar'), 'images/placeholder-sekolah.jpg');
+        $lat = data_get($sekolah, 'latitude');
+        $lng = data_get($sekolah, 'longitude');
+    @endphp
 
-<section class="bg-slate-50 py-20">
-    <div class="mx-auto max-w-5xl px-6">
-        <div class="overflow-hidden rounded-[2rem] bg-white shadow-sm" data-aos="fade-up">
-            <img src="{{ asset('images/placeholder-sekolah.jpg') }}" alt="{{ $sekolah->nama }}" class="h-[430px] w-full object-cover">
-
-            <div class="p-8">
-                <div class="mb-4 inline-flex rounded-full bg-[#2f6b3f]/10 px-4 py-2 text-sm font-bold text-[#2f6b3f]">
-                    {{ $sekolah->agama->nama ?? 'Pendidikan Keagamaan' }}
+    <section class="section-padding bg-white">
+        <div class="container-public grid gap-8 lg:grid-cols-12">
+            <div class="lg:col-span-7">
+                <div class="card-premium-static overflow-hidden">
+                    <img src="{{ $image }}" alt="{{ data_get($sekolah, 'nama') }}" class="h-[420px] w-full object-cover">
                 </div>
-
-                <h2 class="text-3xl font-bold text-slate-900">{{ $sekolah->nama }}</h2>
-
-                <div class="mt-8 grid gap-6 md:grid-cols-2">
-                    <div>
-                        <p class="text-sm text-slate-500">Jenis</p>
-                        <p class="mt-1 font-semibold text-slate-900">{{ $sekolah->jenis ?? '-' }}</p>
+            </div>
+            <div class="lg:col-span-5">
+                <div class="card-premium-static p-8">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="rounded-full bg-[#2f6b3f]/10 px-3 py-1 text-xs font-extrabold text-[#2f6b3f]">{{ data_get($sekolah, 'agama.nama', 'Pendidikan Keagamaan') }}</span>
+                        <span class="rounded-full bg-[#d6a63a]/15 px-3 py-1 text-xs font-extrabold text-[#9a7122]">{{ data_get($sekolah, 'jenis') }}</span>
                     </div>
-
-                    <div>
-                        <p class="text-sm text-slate-500">Kecamatan</p>
-                        <p class="mt-1 font-semibold text-slate-900">{{ $sekolah->kecamatan->nama ?? '-' }}</p>
-                    </div>
-
-                    <div>
-                        <p class="text-sm text-slate-500">Jumlah Siswa</p>
-                        <p class="mt-1 font-semibold text-slate-900">{{ $sekolah->jumlah_siswa ?? '-' }}</p>
-                    </div>
-
-                    <div>
-                        <p class="text-sm text-slate-500">Jumlah Guru</p>
-                        <p class="mt-1 font-semibold text-slate-900">{{ $sekolah->jumlah_guru ?? '-' }}</p>
-                    </div>
+                    <dl class="mt-7 grid gap-5 text-sm">
+                        <div><dt class="font-extrabold text-slate-900">Alamat</dt><dd class="mt-2 leading-7 text-slate-600">{{ data_get($sekolah, 'alamat') }}</dd></div>
+                        <div><dt class="font-extrabold text-slate-900">Kecamatan</dt><dd class="mt-2 text-slate-600">{{ data_get($sekolah, 'kecamatan.nama', '-') }}</dd></div>
+                        @if (data_get($sekolah, 'jumlah_siswa'))<div><dt class="font-extrabold text-slate-900">Jumlah Siswa</dt><dd class="mt-2 text-slate-600">{{ number_format(data_get($sekolah, 'jumlah_siswa'), 0, ',', '.') }}</dd></div>@endif
+                        @if (data_get($sekolah, 'jumlah_guru'))<div><dt class="font-extrabold text-slate-900">Jumlah Guru</dt><dd class="mt-2 text-slate-600">{{ number_format(data_get($sekolah, 'jumlah_guru'), 0, ',', '.') }}</dd></div>@endif
+                        @if (data_get($sekolah, 'status_izin'))<div><dt class="font-extrabold text-slate-900">Status Izin</dt><dd class="mt-2 text-slate-600">{{ data_get($sekolah, 'status_izin') }}</dd></div>@endif
+                    </dl>
+                    <a href="{{ route('public.sekolah-keagamaan.index') }}" class="btn-outline mt-8">Kembali</a>
                 </div>
-
-                <p class="mt-8 leading-relaxed text-slate-600">
-                    {{ $sekolah->alamat ?? 'Alamat belum tersedia.' }}
-                </p>
             </div>
         </div>
-    </div>
-</section>
-@endsection
+
+        @if ($lat && $lng)
+            <div class="container-public mt-8">
+                <div class="card-premium-static overflow-hidden p-3">
+                    <iframe class="h-80 w-full rounded-[1.5rem]" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox={{ $lng - 0.01 }}%2C{{ $lat - 0.01 }}%2C{{ $lng + 0.01 }}%2C{{ $lat + 0.01 }}&layer=mapnik&marker={{ $lat }}%2C{{ $lng }}"></iframe>
+                </div>
+            </div>
+        @endif
+    </section>
+</x-layouts.public>

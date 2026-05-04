@@ -1,65 +1,34 @@
-@extends('layouts.public')
+<x-layouts.public title="Kontak - Peta Harmoni Sangihe">
+    <x-public.page-hero eyebrow="Kontak" title="Hubungi Kami" subtitle="Informasi kontak dan tampilan form pesan untuk Kementerian Agama Kabupaten Kepulauan Sangihe." />
 
-@section('content')
-<x-public.page-hero
-    title="Kontak Kami"
-    subtitle="Hubungi Kementerian Agama Kabupaten Kepulauan Sangihe untuk informasi dan layanan publik."
-/>
-
-<section class="bg-slate-50 py-24">
-    <div class="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-2">
-        <div class="rounded-[2rem] bg-white p-8 shadow-sm" data-aos="fade-right">
-            <h2 class="text-3xl font-bold text-slate-900">Informasi Kontak</h2>
-            <p class="mt-4 leading-relaxed text-slate-600">
-                Silakan hubungi kantor Kementerian Agama Kabupaten Kepulauan Sangihe melalui informasi berikut.
-            </p>
-
-            <div class="mt-8 space-y-5">
-                <div class="flex gap-4">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2f6b3f]/10 text-[#2f6b3f]">
-                        <i class="fa-solid fa-location-dot"></i>
+    <section class="section-padding bg-slate-50">
+        <div class="container-public grid gap-8 lg:grid-cols-12">
+            <div class="lg:col-span-5">
+                <div class="card-premium-static p-8">
+                    <h2 class="text-2xl font-extrabold text-slate-900">Informasi Kantor</h2>
+                    <div class="mt-7 grid gap-5 text-sm leading-7 text-slate-600">
+                        <p><strong class="text-slate-900">Alamat:</strong><br>Kompleks Perkantoran Tahuna, Kabupaten Kepulauan Sangihe, Sulawesi Utara</p>
+                        <p><strong class="text-slate-900">Email:</strong><br>kemenag.sangihe@example.go.id</p>
+                        <p><strong class="text-slate-900">Telepon:</strong><br>(0432) 000000</p>
+                        <p><strong class="text-slate-900">Jam Layanan:</strong><br>Senin - Jumat, 08.00 - 16.00 WITA</p>
                     </div>
-                    <div>
-                        <h3 class="font-bold text-slate-900">Alamat</h3>
-                        <p class="mt-1 text-sm text-slate-600">Kabupaten Kepulauan Sangihe, Sulawesi Utara</p>
-                    </div>
-                </div>
-
-                <div class="flex gap-4">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2f6b3f]/10 text-[#2f6b3f]">
-                        <i class="fa-solid fa-envelope"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-slate-900">Email</h3>
-                        <p class="mt-1 text-sm text-slate-600">info@kemenagsangihe.go.id</p>
-                    </div>
-                </div>
-
-                <div class="flex gap-4">
-                    <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#2f6b3f]/10 text-[#2f6b3f]">
-                        <i class="fa-solid fa-clock"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-slate-900">Jam Layanan</h3>
-                        <p class="mt-1 text-sm text-slate-600">Senin - Jumat, jam kerja kantor</p>
+                    <div class="mt-8 overflow-hidden rounded-[1.5rem] bg-slate-200">
+                        <iframe class="h-72 w-full" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=125.48%2C3.58%2C125.52%2C3.62&layer=mapnik"></iframe>
                     </div>
                 </div>
             </div>
+            <div class="lg:col-span-7">
+                <form class="card-premium-static grid gap-5 p-8">
+                    <div class="grid gap-5 md:grid-cols-2">
+                        <input type="text" placeholder="Nama" class="rounded-2xl border-slate-200 text-sm focus:border-[#2f6b3f] focus:ring-[#2f6b3f]">
+                        <input type="email" placeholder="Email" class="rounded-2xl border-slate-200 text-sm focus:border-[#2f6b3f] focus:ring-[#2f6b3f]">
+                    </div>
+                    <input type="text" placeholder="Subjek" class="rounded-2xl border-slate-200 text-sm focus:border-[#2f6b3f] focus:ring-[#2f6b3f]">
+                    <textarea rows="7" placeholder="Pesan" class="rounded-2xl border-slate-200 text-sm focus:border-[#2f6b3f] focus:ring-[#2f6b3f]"></textarea>
+                    <button type="button" class="btn-primary justify-self-start">Kirim Pesan</button>
+                    <p class="text-xs leading-6 text-slate-500">Form ini masih berupa tampilan. Integrasi pengiriman pesan dapat ditambahkan pada tahap berikutnya.</p>
+                </form>
+            </div>
         </div>
-
-        <div class="rounded-[2rem] bg-white p-8 shadow-sm" data-aos="fade-left">
-            <h2 class="text-3xl font-bold text-slate-900">Kirim Pesan</h2>
-            <p class="mt-4 text-sm text-slate-600">Form ini masih tampilan awal. Fungsi pengiriman dapat ditambahkan kemudian.</p>
-
-            <form class="mt-8 space-y-4">
-                <input type="text" placeholder="Nama lengkap" class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#2f6b3f]">
-                <input type="email" placeholder="Email / kontak" class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#2f6b3f]">
-                <textarea rows="5" placeholder="Pesan Anda" class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#2f6b3f]"></textarea>
-                <button type="button" class="rounded-full bg-[#2f6b3f] px-7 py-4 text-sm font-bold text-white">
-                    Kirim Pesan
-                </button>
-            </form>
-        </div>
-    </div>
-</section>
-@endsection
+    </section>
+</x-layouts.public>

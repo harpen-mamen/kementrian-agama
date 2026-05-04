@@ -1,58 +1,46 @@
-@extends('layouts.public')
+<x-layouts.public title="Rumah Ibadah - Peta Harmoni Sangihe">
+    <x-public.page-hero eyebrow="Direktori Publik" title="Rumah Ibadah" subtitle="Data rumah ibadah publik di Kabupaten Kepulauan Sangihe dengan filter wilayah, agama, dan jenis." />
 
-@section('content')
-<x-public.page-hero
-    title="Rumah Ibadah"
-    subtitle="Direktori informasi rumah ibadah yang telah dipublikasikan untuk masyarakat."
-/>
-
-<section class="bg-slate-50 py-20">
-    <div class="mx-auto max-w-7xl px-6">
-        <form class="mb-10 rounded-3xl bg-white p-6 shadow-sm" method="GET" data-aos="fade-up">
-            <div class="grid gap-4 md:grid-cols-3">
-                <input
-                    type="text"
-                    name="q"
-                    value="{{ request('q') }}"
-                    placeholder="Cari nama rumah ibadah..."
-                    class="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#2f6b3f]"
-                >
-
-                <select name="jenis" class="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#2f6b3f]">
-                    <option value="">Semua Jenis</option>
-                    <option value="Masjid" @selected(request('jenis') === 'Masjid')>Masjid</option>
-                    <option value="Gereja" @selected(request('jenis') === 'Gereja')>Gereja</option>
-                    <option value="Pura" @selected(request('jenis') === 'Pura')>Pura</option>
-                    <option value="Vihara" @selected(request('jenis') === 'Vihara')>Vihara</option>
-                    <option value="Klenteng" @selected(request('jenis') === 'Klenteng')>Klenteng</option>
+    <section class="section-padding bg-slate-50">
+        <div class="container-public">
+            <form method="GET" class="card-premium-static grid gap-4 p-5 md:grid-cols-2 lg:grid-cols-5">
+                <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama rumah ibadah" class="rounded-2xl border-slate-200 text-sm focus:border-[#2f6b3f] focus:ring-[#2f6b3f] lg:col-span-2">
+                <select name="agama" class="rounded-2xl border-slate-200 text-sm focus:border-[#2f6b3f] focus:ring-[#2f6b3f]">
+                    <option value="">Semua agama</option>
+                    @foreach ($agamas as $agama)
+                        <option value="{{ $agama->id }}" @selected(request('agama') == $agama->id)>{{ $agama->nama }}</option>
+                    @endforeach
                 </select>
+                <select name="kecamatan" class="rounded-2xl border-slate-200 text-sm focus:border-[#2f6b3f] focus:ring-[#2f6b3f]">
+                    <option value="">Semua kecamatan</option>
+                    @foreach ($kecamatans as $kecamatan)
+                        <option value="{{ $kecamatan->id }}" @selected(request('kecamatan') == $kecamatan->id)>{{ $kecamatan->nama }}</option>
+                    @endforeach
+                </select>
+                <select name="jenis" class="rounded-2xl border-slate-200 text-sm focus:border-[#2f6b3f] focus:ring-[#2f6b3f]">
+                    <option value="">Semua jenis</option>
+                    @foreach ($jenisRumahIbadah as $jenis)
+                        <option value="{{ $jenis }}" @selected(request('jenis') == $jenis)>{{ $jenis }}</option>
+                    @endforeach
+                </select>
+                <div class="flex gap-3 lg:col-span-5">
+                    <button class="btn-primary" type="submit">Terapkan Filter</button>
+                    <a href="{{ route('public.rumah-ibadah.index') }}" class="btn-outline">Reset</a>
+                </div>
+            </form>
 
-                <button class="rounded-2xl bg-[#2f6b3f] px-5 py-3 text-sm font-bold text-white">
-                    Cari Data
-                </button>
-            </div>
-        </form>
-
-        @if($rumahIbadahs instanceof \Illuminate\Pagination\AbstractPaginator && $rumahIbadahs->count())
-            <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                @foreach($rumahIbadahs as $index => $item)
-                    <x-public.worship-card
-                        :item="$item"
-                        :delay="$index * 80"
-                        :aos="$index % 2 === 0 ? 'fade-left' : 'fade-right'"
-                    />
-                @endforeach
-            </div>
-
-            <div class="mt-12">
-                {{ $rumahIbadahs->links() }}
-            </div>
-        @else
-            <x-public.empty-state
-                title="Data rumah ibadah belum tersedia"
-                description="Data rumah ibadah yang tampil untuk publik adalah data yang sudah dipublikasikan oleh admin pusat."
-            />
-        @endif
-    </div>
-</section>
-@endsection
+            @if ($rumahIbadahs->count())
+                <div class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    @foreach ($rumahIbadahs as $item)
+                        <x-public.worship-card :item="$item" />
+                    @endforeach
+                </div>
+                <div class="mt-10">{{ $rumahIbadahs->links() }}</div>
+            @else
+                <div class="mt-10">
+                    <x-public.empty-state title="Data rumah ibadah belum tersedia" message="Data publik akan tampil setelah dipublikasikan atau diverifikasi oleh admin." />
+                </div>
+            @endif
+        </div>
+    </section>
+</x-layouts.public>

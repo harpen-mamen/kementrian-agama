@@ -1,67 +1,148 @@
-@extends('layouts.public')
+<x-layouts.public title="Peta Digital - Peta Harmoni Sangihe">
+    <x-public.page-hero eyebrow="Peta Digital" title="Sebaran Rumah Ibadah" subtitle="Peta interaktif rumah ibadah publik di Kabupaten Kepulauan Sangihe dengan filter agama, jenis, dan kecamatan." />
 
-@push('styles')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-@endpush
+    @push('styles')
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+        <style>
+            #map { min-height: 680px; }
+            .leaflet-popup-content-wrapper { border-radius: 18px; }
+        </style>
+    @endpush
 
-@section('content')
-<x-public.page-hero
-    title="Peta Digital Keagamaan"
-    subtitle="Melihat sebaran rumah ibadah dan informasi keagamaan Kabupaten Kepulauan Sangihe secara visual dan mudah dipahami."
-/>
+    <section class="section-padding bg-slate-50">
+        <div class="container-public">
+            <div class="card-premium-static mb-6 grid gap-4 p-5 md:grid-cols-4">
+                <select id="filterAgama" class="rounded-2xl border-slate-200 text-sm focus:border-[#2f6b3f] focus:ring-[#2f6b3f]">
+                    <option value="">Semua agama</option>
+                    @foreach ($agamas as $agama)
+                        <option value="{{ $agama->nama }}">{{ $agama->nama }}</option>
+                    @endforeach
+                </select>
+                <select id="filterJenis" class="rounded-2xl border-slate-200 text-sm focus:border-[#2f6b3f] focus:ring-[#2f6b3f]">
+                    <option value="">Semua jenis</option>
+                    @foreach ($jenisRumahIbadah as $jenis)
+                        <option value="{{ $jenis }}">{{ $jenis }}</option>
+                    @endforeach
+                </select>
+                <select id="filterKecamatan" class="rounded-2xl border-slate-200 text-sm focus:border-[#2f6b3f] focus:ring-[#2f6b3f]">
+                    <option value="">Semua kecamatan</option>
+                    @foreach ($kecamatans as $kecamatan)
+                        <option value="{{ $kecamatan->nama }}">{{ $kecamatan->nama }}</option>
+                    @endforeach
+                </select>
+                <button id="resetMapFilter" type="button" class="btn-outline">Reset Filter</button>
+            </div>
 
-<section class="bg-slate-50 py-16">
-    <div class="mx-auto max-w-7xl px-6">
-        <div class="mb-8 rounded-3xl bg-white p-6 shadow-sm" data-aos="fade-up">
-            <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-900">Peta Rumah Ibadah</h2>
-                    <p class="mt-1 text-sm text-slate-600">Data yang tampil adalah data yang telah dipublikasikan.</p>
+            <div class="grid gap-6 lg:grid-cols-12">
+                <div class="lg:col-span-9">
+                    <div class="card-premium-static overflow-hidden p-3">
+                        <div id="map" class="h-[680px] rounded-[1.5rem] bg-slate-200"></div>
+                    </div>
                 </div>
-
-                <div class="flex flex-wrap gap-2 text-xs font-semibold">
-                    <span class="rounded-full bg-[#2f6b3f]/10 px-4 py-2 text-[#2f6b3f]">Rumah Ibadah</span>
-                    <span class="rounded-full bg-[#0f5f7a]/10 px-4 py-2 text-[#0f5f7a]">Pendidikan</span>
-                    <span class="rounded-full bg-[#d6a63a]/10 px-4 py-2 text-[#9a741d]">Wilayah</span>
-                </div>
+                <aside class="lg:col-span-3">
+                    <div class="card-premium-static p-6">
+                        <h3 class="text-lg font-extrabold text-slate-900">Legenda</h3>
+                        <div class="mt-5 grid gap-4 text-sm text-slate-600">
+                            <div class="flex items-center gap-3"><span class="h-4 w-4 rounded-full bg-[#2f6b3f]"></span>Marker rumah ibadah</div>
+                            <div class="flex items-center gap-3"><span class="h-4 w-4 rounded border-2 border-[#2f6b3f] bg-[#2f6b3f]/10"></span>Batas wilayah GeoJSON</div>
+                            <p class="leading-7">Jika file <span class="font-bold text-slate-900">public/geojson/batas-sangihe.geojson</span> tersedia, batas wilayah akan tampil otomatis.</p>
+                        </div>
+                    </div>
+                </aside>
             </div>
         </div>
+    </section>
 
-        <div class="overflow-hidden rounded-[2rem] bg-white shadow-2xl" data-aos="zoom-in">
-            <div id="map" class="h-[650px] w-full"></div>
-        </div>
-    </div>
-</section>
-@endsection
+    @push('scripts')
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script>
+            const worshipPlaces = @json($mapRumahIbadahs);
+            const defaultCenter = [3.600, 125.500];
+            const map = L.map('map', { scrollWheelZoom: true }).setView(defaultCenter, 10);
 
-@push('scripts')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-    const map = L.map('map').setView([3.6, 125.5], 10);
+            const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
+            const satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 19,
+                attribution: 'Tiles &copy; Esri'
+            });
 
-    const rumahIbadahs = @json($rumahIbadahs ?? []);
+            const markerLayer = L.layerGroup().addTo(map);
+            const boundaryLayer = L.layerGroup().addTo(map);
 
-    rumahIbadahs.forEach((item) => {
-        if (!item.latitude || !item.longitude) {
-            return;
-        }
+            L.control.layers({ 'Peta Standar': osm, 'Satelit': satellite }, { 'Rumah Ibadah': markerLayer, 'Batas Wilayah': boundaryLayer }).addTo(map);
 
-        const popup = `
-            <div style="min-width: 220px">
-                <strong>${item.nama ?? 'Rumah Ibadah'}</strong><br>
-                <span>${item.jenis ?? ''}</span><br>
-                <span>${item.kecamatan?.nama ?? ''}</span><br>
-                <a href="/rumah-ibadah/${item.id}" style="display:inline-block;margin-top:8px;color:#2f6b3f;font-weight:bold">
-                    Lihat Detail
-                </a>
-            </div>
-        `;
+            function popupContent(place) {
+                return `
+                    <div style="min-width:210px">
+                        <strong>${place.nama || 'Rumah Ibadah'}</strong>
+                        <div style="margin-top:8px;color:#475569;font-size:13px;line-height:1.6">
+                            ${place.jenis || '-'}<br>
+                            ${place.agama || '-'}<br>
+                            ${place.kecamatan || '-'}
+                        </div>
+                        <a href="${place.detail_url}" style="display:inline-block;margin-top:10px;color:#2f6b3f;font-weight:800">Lihat detail</a>
+                    </div>
+                `;
+            }
 
-        L.marker([item.latitude, item.longitude]).addTo(map).bindPopup(popup);
-    });
-</script>
-@endpush
+            function renderMarkers() {
+                markerLayer.clearLayers();
+                const agama = document.getElementById('filterAgama').value;
+                const jenis = document.getElementById('filterJenis').value;
+                const kecamatan = document.getElementById('filterKecamatan').value;
+
+                const filtered = worshipPlaces.filter((place) => {
+                    return (!agama || place.agama === agama)
+                        && (!jenis || place.jenis === jenis)
+                        && (!kecamatan || place.kecamatan === kecamatan)
+                        && Number.isFinite(Number(place.latitude))
+                        && Number.isFinite(Number(place.longitude));
+                });
+
+                filtered.forEach((place) => {
+                    L.marker([Number(place.latitude), Number(place.longitude)]).bindPopup(popupContent(place)).addTo(markerLayer);
+                });
+
+                if (filtered.length) {
+                    const bounds = L.latLngBounds(filtered.map((place) => [Number(place.latitude), Number(place.longitude)]));
+                    map.fitBounds(bounds.pad(0.2), { maxZoom: 13 });
+                } else {
+                    map.setView(defaultCenter, 10);
+                }
+            }
+
+            ['filterAgama', 'filterJenis', 'filterKecamatan'].forEach((id) => {
+                document.getElementById(id).addEventListener('change', renderMarkers);
+            });
+
+            document.getElementById('resetMapFilter').addEventListener('click', () => {
+                ['filterAgama', 'filterJenis', 'filterKecamatan'].forEach((id) => document.getElementById(id).value = '');
+                renderMarkers();
+            });
+
+            fetch('/geojson/batas-sangihe.geojson')
+                .then((response) => {
+                    if (!response.ok) throw new Error('GeoJSON batas wilayah belum tersedia');
+                    return response.json();
+                })
+                .then((geojson) => {
+                    L.geoJSON(geojson, {
+                        style: { color: '#2f6b3f', weight: 2, fillColor: '#2f6b3f', fillOpacity: 0.08 },
+                        onEachFeature: (feature, layer) => {
+                            const props = feature.properties || {};
+                            const name = props.nama || props.NAMOBJ || props.WADMKC || props.name || 'Batas Wilayah';
+                            layer.bindPopup(name);
+                        }
+                    }).addTo(boundaryLayer);
+                })
+                .catch(() => console.warn('GeoJSON batas wilayah belum tersedia'));
+
+            renderMarkers();
+            setTimeout(() => map.invalidateSize(), 250);
+        </script>
+    @endpush
+</x-layouts.public>

@@ -1,57 +1,40 @@
-@extends('layouts.public')
+<x-layouts.public title="Sekolah Keagamaan - Peta Harmoni Sangihe">
+    <x-public.page-hero eyebrow="Direktori Pendidikan" title="Sekolah Keagamaan" subtitle="Daftar lembaga pendidikan keagamaan publik di Kabupaten Kepulauan Sangihe." />
 
-@section('content')
-<x-public.page-hero
-    title="Pendidikan Keagamaan"
-    subtitle="Informasi sekolah dan lembaga pendidikan keagamaan di Kabupaten Kepulauan Sangihe."
-/>
+    <section class="section-padding bg-slate-50">
+        <div class="container-public">
+            <form method="GET" class="card-premium-static grid gap-4 p-5 md:grid-cols-2 lg:grid-cols-4">
+                <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama sekolah/lembaga" class="rounded-2xl border-slate-200 text-sm focus:border-[#2f6b3f] focus:ring-[#2f6b3f] lg:col-span-2">
+                <select name="agama" class="rounded-2xl border-slate-200 text-sm focus:border-[#2f6b3f] focus:ring-[#2f6b3f]">
+                    <option value="">Semua agama</option>
+                    @foreach ($agamas as $agama)
+                        <option value="{{ $agama->id }}" @selected(request('agama') == $agama->id)>{{ $agama->nama }}</option>
+                    @endforeach
+                </select>
+                <select name="kecamatan" class="rounded-2xl border-slate-200 text-sm focus:border-[#2f6b3f] focus:ring-[#2f6b3f]">
+                    <option value="">Semua kecamatan</option>
+                    @foreach ($kecamatans as $kecamatan)
+                        <option value="{{ $kecamatan->id }}" @selected(request('kecamatan') == $kecamatan->id)>{{ $kecamatan->nama }}</option>
+                    @endforeach
+                </select>
+                <div class="flex gap-3 lg:col-span-4">
+                    <button class="btn-primary" type="submit">Terapkan Filter</button>
+                    <a href="{{ route('public.sekolah-keagamaan.index') }}" class="btn-outline">Reset</a>
+                </div>
+            </form>
 
-<section class="bg-slate-50 py-20">
-    <div class="mx-auto max-w-7xl px-6">
-        <form class="mb-10 rounded-3xl bg-white p-6 shadow-sm" method="GET" data-aos="fade-up">
-            <div class="grid gap-4 md:grid-cols-2">
-                <input
-                    type="text"
-                    name="q"
-                    value="{{ request('q') }}"
-                    placeholder="Cari nama sekolah/lembaga..."
-                    class="rounded-2xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-[#2f6b3f]"
-                >
-
-                <button class="rounded-2xl bg-[#2f6b3f] px-5 py-3 text-sm font-bold text-white">
-                    Cari Data
-                </button>
-            </div>
-        </form>
-
-        @if($sekolahs instanceof \Illuminate\Pagination\AbstractPaginator && $sekolahs->count())
-            <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                @foreach($sekolahs as $index => $sekolah)
-                    <div class="group overflow-hidden rounded-3xl bg-white shadow-sm transition hover:-translate-y-2 hover:shadow-2xl" data-aos="fade-up" data-aos-delay="{{ $index * 80 }}">
-                        <img src="{{ asset('images/placeholder-sekolah.jpg') }}" alt="{{ $sekolah->nama }}" class="h-56 w-full object-cover transition duration-700 group-hover:scale-105">
-
-                        <div class="p-6">
-                            <div class="mb-2 text-sm font-semibold text-[#d6a63a]">{{ $sekolah->jenis ?? 'Lembaga Pendidikan' }}</div>
-                            <h3 class="text-xl font-bold text-slate-900">{{ $sekolah->nama }}</h3>
-                            <p class="mt-3 text-sm text-slate-600">{{ $sekolah->kecamatan->nama ?? 'Kabupaten Kepulauan Sangihe' }}</p>
-
-                            <a href="{{ route('public.sekolah-keagamaan.show', $sekolah->id) }}" class="mt-5 inline-flex text-sm font-bold text-[#2f6b3f]">
-                                Lihat Detail
-                            </a>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            <div class="mt-12">
-                {{ $sekolahs->links() }}
-            </div>
-        @else
-            <x-public.empty-state
-                title="Data pendidikan keagamaan belum tersedia"
-                description="Data yang tampil untuk publik adalah data yang sudah dipublikasikan oleh admin pusat."
-            />
-        @endif
-    </div>
-</section>
-@endsection
+            @if ($sekolahs->count())
+                <div class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    @foreach ($sekolahs as $item)
+                        <x-public.school-card :item="$item" />
+                    @endforeach
+                </div>
+                <div class="mt-10">{{ $sekolahs->links() }}</div>
+            @else
+                <div class="mt-10">
+                    <x-public.empty-state title="Data sekolah keagamaan belum tersedia" message="Data publik akan tampil setelah dipublikasikan atau diverifikasi oleh admin." />
+                </div>
+            @endif
+        </div>
+    </section>
+</x-layouts.public>

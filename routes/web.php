@@ -1,25 +1,24 @@
 <?php
 
+use App\Http\Controllers\PublicPageController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PublicController;
 
-Route::get('/', [PublicController::class, 'home'])->name('public.home');
 
-Route::get('/profil', [PublicController::class, 'profil'])->name('public.profil');
 
-Route::get('/peta-digital', [PublicController::class, 'petaDigital'])->name('public.peta');
+Route::get('/', function () {
+    return view('welcome');
+})->name('public.home');
 
-Route::get('/statistik', [PublicController::class, 'statistik'])->name('public.statistik');
-
-Route::get('/rumah-ibadah', [PublicController::class, 'rumahIbadah'])->name('public.rumah-ibadah.index');
-Route::get('/rumah-ibadah/{id}', [PublicController::class, 'detailRumahIbadah'])->name('public.rumah-ibadah.show');
-
-Route::get('/sekolah-keagamaan', [PublicController::class, 'sekolahKeagamaan'])->name('public.sekolah-keagamaan.index');
-Route::get('/sekolah-keagamaan/{id}', [PublicController::class, 'detailSekolahKeagamaan'])->name('public.sekolah-keagamaan.show');
-
-Route::get('/berita', [PublicController::class, 'berita'])->name('public.berita.index');
-Route::get('/berita/{slug}', [PublicController::class, 'detailBerita'])->name('public.berita.show');
-
-Route::get('/layanan', [PublicController::class, 'layanan'])->name('public.layanan');
-
-Route::get('/kontak', [PublicController::class, 'kontak'])->name('public.kontak');
+Route::prefix('public')->name('public.')->group(function () {
+    Route::get('/profil', [PublicPageController::class, 'profil'])->name('profil');
+    Route::get('/rumah-ibadah', [PublicPageController::class, 'rumahIbadah'])->name('rumah-ibadah.index');
+    Route::get('/rumah-ibadah/{id}', [PublicPageController::class, 'detailRumahIbadah'])->name('rumah-ibadah.show');
+    Route::get('/sekolah-keagamaan', [PublicPageController::class, 'sekolahKeagamaan'])->name('sekolah-keagamaan.index');
+    Route::get('/sekolah-keagamaan/{id}', [PublicPageController::class, 'detailSekolahKeagamaan'])->name('sekolah-keagamaan.show');
+    Route::get('/berita', [PublicPageController::class, 'berita'])->name('berita.index');
+    Route::get('/berita/{slug}', [PublicPageController::class, 'detailBerita'])->name('berita.show');
+    Route::get('/peta-digital', [PublicPageController::class, 'petaDigital'])->name('peta');
+    Route::get('/statistik', [PublicPageController::class, 'statistik'])->name('statistik');
+    Route::get('/layanan', [PublicPageController::class, 'layanan'])->name('layanan');
+    Route::get('/kontak', [PublicPageController::class, 'kontak'])->name('kontak');
+});

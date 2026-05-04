@@ -1,24 +1,11 @@
-@props([
-    'eyebrow' => '',
-    'title',
-    'description' => '',
-    'align' => 'center',
-])
+@props(['eyebrow' => null, 'title', 'subtitle' => null, 'align' => 'left'])
 
-<div class="{{ $align === 'left' ? 'text-left' : 'mx-auto max-w-3xl text-center' }}" data-aos="fade-up">
-    @if($eyebrow)
-        <div class="mb-3 inline-flex rounded-full bg-[#2f6b3f]/10 px-4 py-2 text-sm font-semibold text-[#2f6b3f]">
-            {{ $eyebrow }}
-        </div>
+<div class="{{ $align === 'center' ? 'mx-auto max-w-3xl text-center' : 'max-w-3xl' }}">
+    @if ($eyebrow)
+        <div class="eyebrow">{{ $eyebrow }}</div>
     @endif
-
-    <h2 class="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-        {{ $title }}
-    </h2>
-
-    @if($description)
-        <p class="mt-4 text-base leading-relaxed text-slate-600 md:text-lg">
-            {{ $description }}
-        </p>
+    <h2 class="section-title">{{ $title }}</h2>
+    @if ($subtitle)
+        <p class="section-subtitle">{{ $subtitle }}</p>
     @endif
 </div>

@@ -1,75 +1,43 @@
-@extends('layouts.public')
+<x-layouts.public title="{{ data_get($rumahIbadah, 'nama') }} - Rumah Ibadah">
+    <x-public.page-hero eyebrow="Detail Rumah Ibadah" title="{{ data_get($rumahIbadah, 'nama') }}" subtitle="{{ data_get($rumahIbadah, 'jenis') }} di {{ data_get($rumahIbadah, 'kecamatan.nama', 'Kabupaten Kepulauan Sangihe') }}" />
 
-@section('content')
-<x-public.page-hero
-    :title="$rumahIbadah->nama"
-    subtitle="Informasi rumah ibadah yang telah dipublikasikan untuk masyarakat."
-/>
+    @php
+        $image = \App\Http\Controllers\PublicPageController::worshipImage($rumahIbadah);
+        $lat = data_get($rumahIbadah, 'latitude');
+        $lng = data_get($rumahIbadah, 'longitude');
+    @endphp
 
-<section class="bg-slate-50 py-20">
-    <div class="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-3">
-        <div class="lg:col-span-2">
-            <div class="overflow-hidden rounded-[2rem] bg-white shadow-sm" data-aos="fade-up">
-                <img src="{{ asset('images/placeholder-rumah-ibadah.jpg') }}" alt="{{ $rumahIbadah->nama }}" class="h-[430px] w-full object-cover">
-
-                <div class="p-8">
-                    <div class="mb-4 inline-flex rounded-full bg-[#2f6b3f]/10 px-4 py-2 text-sm font-bold text-[#2f6b3f]">
-                        {{ $rumahIbadah->agama->nama ?? 'Agama' }}
+    <section class="section-padding bg-white">
+        <div class="container-public grid gap-8 lg:grid-cols-12">
+            <div class="lg:col-span-7">
+                <div class="card-premium-static overflow-hidden">
+                    <img src="{{ $image }}" alt="{{ data_get($rumahIbadah, 'nama') }}" class="h-[420px] w-full object-cover">
+                </div>
+            </div>
+            <div class="lg:col-span-5">
+                <div class="card-premium-static p-8">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="rounded-full bg-[#2f6b3f]/10 px-3 py-1 text-xs font-extrabold text-[#2f6b3f]">{{ data_get($rumahIbadah, 'agama.nama', 'Lintas Agama') }}</span>
+                        <span class="rounded-full bg-[#d6a63a]/15 px-3 py-1 text-xs font-extrabold text-[#9a7122]">{{ data_get($rumahIbadah, 'jenis') }}</span>
                     </div>
-
-                    <h2 class="text-3xl font-bold text-slate-900">{{ $rumahIbadah->nama }}</h2>
-
-                    <p class="mt-4 leading-relaxed text-slate-600">
-                        {{ $rumahIbadah->alamat ?? 'Alamat belum tersedia.' }}
-                    </p>
+                    <dl class="mt-7 grid gap-5 text-sm">
+                        <div><dt class="font-extrabold text-slate-900">Alamat</dt><dd class="mt-2 leading-7 text-slate-600">{{ data_get($rumahIbadah, 'alamat') }}</dd></div>
+                        <div><dt class="font-extrabold text-slate-900">Kecamatan</dt><dd class="mt-2 text-slate-600">{{ data_get($rumahIbadah, 'kecamatan.nama', '-') }}</dd></div>
+                        @if (data_get($rumahIbadah, 'jumlah_jemaat'))<div><dt class="font-extrabold text-slate-900">Jumlah Jemaat/Jamaah</dt><dd class="mt-2 text-slate-600">{{ number_format(data_get($rumahIbadah, 'jumlah_jemaat'), 0, ',', '.') }}</dd></div>@endif
+                        @if (data_get($rumahIbadah, 'kapasitas'))<div><dt class="font-extrabold text-slate-900">Kapasitas</dt><dd class="mt-2 text-slate-600">{{ number_format(data_get($rumahIbadah, 'kapasitas'), 0, ',', '.') }} orang</dd></div>@endif
+                        @if (data_get($rumahIbadah, 'jadwal_ibadah'))<div><dt class="font-extrabold text-slate-900">Jadwal Ibadah</dt><dd class="mt-2 whitespace-pre-line leading-7 text-slate-600">{{ data_get($rumahIbadah, 'jadwal_ibadah') }}</dd></div>@endif
+                    </dl>
+                    <a href="{{ route('public.rumah-ibadah.index') }}" class="btn-outline mt-8">Kembali</a>
                 </div>
             </div>
         </div>
 
-        <aside class="space-y-6">
-            <div class="rounded-[2rem] bg-white p-8 shadow-sm" data-aos="fade-left">
-                <h3 class="mb-6 text-xl font-bold text-slate-900">Informasi Ringkas</h3>
-
-                <div class="space-y-4 text-sm">
-                    <div class="flex justify-between gap-4 border-b border-slate-100 pb-3">
-                        <span class="text-slate-500">Jenis</span>
-                        <span class="font-semibold text-slate-900">{{ $rumahIbadah->jenis ?? '-' }}</span>
-                    </div>
-
-                    <div class="flex justify-between gap-4 border-b border-slate-100 pb-3">
-                        <span class="text-slate-500">Agama</span>
-                        <span class="font-semibold text-slate-900">{{ $rumahIbadah->agama->nama ?? '-' }}</span>
-                    </div>
-
-                    <div class="flex justify-between gap-4 border-b border-slate-100 pb-3">
-                        <span class="text-slate-500">Kecamatan</span>
-                        <span class="font-semibold text-slate-900">{{ $rumahIbadah->kecamatan->nama ?? '-' }}</span>
-                    </div>
-
-                    <div class="flex justify-between gap-4 border-b border-slate-100 pb-3">
-                        <span class="text-slate-500">Jemaat/Jamaah</span>
-                        <span class="font-semibold text-slate-900">{{ $rumahIbadah->jumlah_jemaat ?? '-' }}</span>
-                    </div>
-
-                    <div class="flex justify-between gap-4 border-b border-slate-100 pb-3">
-                        <span class="text-slate-500">Kapasitas</span>
-                        <span class="font-semibold text-slate-900">{{ $rumahIbadah->kapasitas ?? '-' }}</span>
-                    </div>
-
-                    <div class="flex justify-between gap-4">
-                        <span class="text-slate-500">Status</span>
-                        <span class="font-semibold text-[#2f6b3f]">Dipublikasikan</span>
-                    </div>
+        @if ($lat && $lng)
+            <div class="container-public mt-8">
+                <div class="card-premium-static overflow-hidden p-3">
+                    <iframe class="h-80 w-full rounded-[1.5rem]" loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox={{ $lng - 0.01 }}%2C{{ $lat - 0.01 }}%2C{{ $lng + 0.01 }}%2C{{ $lat + 0.01 }}&layer=mapnik&marker={{ $lat }}%2C{{ $lng }}"></iframe>
                 </div>
             </div>
-
-            <div class="rounded-[2rem] bg-white p-8 shadow-sm" data-aos="fade-left" data-aos-delay="100">
-                <h3 class="mb-3 text-xl font-bold text-slate-900">Jadwal Ibadah</h3>
-                <p class="text-sm leading-relaxed text-slate-600">
-                    {{ $rumahIbadah->jadwal_ibadah ?? 'Jadwal ibadah belum tersedia untuk publik.' }}
-                </p>
-            </div>
-        </aside>
-    </div>
-</section>
-@endsection
+        @endif
+    </section>
+</x-layouts.public>

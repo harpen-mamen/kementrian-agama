@@ -1,30 +1,18 @@
-@props([
-    'title',
-    'subtitle' => '',
-    'image' => asset('images/hero-sangihe.jpg'),
-])
+@props(['title', 'subtitle' => null, 'eyebrow' => null, 'image' => null])
 
-<section class="relative flex min-h-[430px] items-center overflow-hidden bg-slate-900 pt-28">
-    <div class="absolute inset-0">
-        <img src="{{ $image }}" alt="{{ $title }}" class="h-full w-full object-cover">
-        <div class="absolute inset-0 bg-gradient-to-r from-slate-950/85 via-slate-900/65 to-slate-900/30"></div>
-    </div>
-
-    <div class="relative z-10 mx-auto w-full max-w-7xl px-6 py-20">
-        <div class="max-w-3xl" data-aos="fade-up">
-            <div class="mb-5 inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur">
-                Peta Harmoni Sangihe
-            </div>
-
-            <h1 class="text-4xl font-bold leading-tight text-white md:text-6xl">
-                {{ $title }}
-            </h1>
-
-            @if($subtitle)
-                <p class="mt-6 max-w-2xl text-lg leading-relaxed text-white/80">
-                    {{ $subtitle }}
-                </p>
-            @endif
-        </div>
+<section class="relative overflow-hidden bg-slate-950">
+    @if ($image)
+        <img src="{{ $image }}" alt="{{ $title }}" class="absolute inset-0 h-full w-full object-cover object-center opacity-35" onerror="this.style.display='none'">
+    @endif
+    <div class="absolute inset-0 bg-gradient-to-br from-[#0f5f7a] via-[#2f6b3f] to-slate-950"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(214,166,58,0.18),transparent_32%)]"></div>
+    <div class="container-public relative py-16 lg:py-20">
+        @if ($eyebrow)
+            <div class="eyebrow-light">{{ $eyebrow }}</div>
+        @endif
+        <h1 class="mt-5 max-w-4xl text-3xl font-extrabold leading-tight tracking-[-0.03em] text-white sm:text-4xl lg:text-5xl">{{ $title }}</h1>
+        @if ($subtitle)
+            <p class="mt-5 max-w-3xl text-base leading-8 text-white/75">{{ $subtitle }}</p>
+        @endif
     </div>
 </section>

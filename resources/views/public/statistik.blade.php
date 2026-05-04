@@ -1,79 +1,66 @@
-@extends('layouts.public')
+<x-layouts.public title="Statistik - Peta Harmoni Sangihe">
+    <x-public.page-hero eyebrow="Infografis Publik" title="Statistik Keagamaan" subtitle="Ringkasan data publik rumah ibadah, agama, pendidikan keagamaan, wilayah, dan berita." />
 
-@section('content')
-<x-public.page-hero
-    title="Statistik Keagamaan"
-    subtitle="Ringkasan informasi keagamaan yang disajikan secara sederhana, informatif, dan mudah dipahami masyarakat."
-/>
-
-<section class="bg-slate-50 py-24">
-    <div class="mx-auto max-w-7xl px-6">
-        <x-public.section-heading
-            eyebrow="Ringkasan Data"
-            title="Informasi Statistik Publik"
-            description="Data publik ditampilkan secara ringkas. Data rinci tetap dikelola dan diverifikasi melalui admin Kemenag."
-        />
-
-        <div class="mt-12 grid gap-6 md:grid-cols-4">
-            <div class="rounded-3xl bg-white p-8 shadow-sm" data-aos="fade-up">
-                <div class="text-4xl font-bold text-[#2f6b3f]">{{ $stats['rumah_ibadah'] ?? 0 }}</div>
-                <p class="mt-2 text-sm font-semibold text-slate-600">Rumah Ibadah</p>
+    <section class="section-padding bg-slate-50">
+        <div class="container-public">
+            <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-5">
+                @foreach ([['Rumah Ibadah', $stats['totalRumahIbadah'], 'fa-place-of-worship'], ['Agama', $stats['totalAgama'], 'fa-hands-praying'], ['Sekolah', $stats['totalSekolah'], 'fa-school'], ['Kecamatan', $stats['totalKecamatan'], 'fa-map-location-dot'], ['Berita', $stats['totalBerita'], 'fa-newspaper']] as [$label, $value, $icon])
+                    <div class="card-premium-static p-6">
+                        <div class="icon-wrap bg-[#2f6b3f]/10 text-[#2f6b3f]"><i class="fa-solid {{ $icon }}"></i></div>
+                        <div class="mt-5 text-3xl font-extrabold text-slate-900">{{ number_format($value, 0, ',', '.') }}</div>
+                        <div class="mt-2 text-sm font-bold text-slate-500">{{ $label }}</div>
+                    </div>
+                @endforeach
             </div>
 
-            <div class="rounded-3xl bg-white p-8 shadow-sm" data-aos="fade-up" data-aos-delay="100">
-                <div class="text-4xl font-bold text-[#0f5f7a]">{{ $stats['sekolah_keagamaan'] ?? 0 }}</div>
-                <p class="mt-2 text-sm font-semibold text-slate-600">Pendidikan Keagamaan</p>
-            </div>
-
-            <div class="rounded-3xl bg-white p-8 shadow-sm" data-aos="fade-up" data-aos-delay="200">
-                <div class="text-4xl font-bold text-[#d6a63a]">{{ $stats['berita'] ?? 0 }}</div>
-                <p class="mt-2 text-sm font-semibold text-slate-600">Berita Dipublikasikan</p>
-            </div>
-
-            <div class="rounded-3xl bg-white p-8 shadow-sm" data-aos="fade-up" data-aos-delay="300">
-                <div class="text-4xl font-bold text-slate-900">{{ $stats['kecamatan'] ?? 0 }}</div>
-                <p class="mt-2 text-sm font-semibold text-slate-600">Kecamatan</p>
+            <div class="mt-10 grid gap-6 lg:grid-cols-2">
+                <div class="card-premium-static p-7">
+                    <h3 class="text-lg font-extrabold text-slate-900">Rumah Ibadah per Agama</h3>
+                    <canvas id="chartRumahAgama" class="mt-6 h-80"></canvas>
+                    <div id="emptyRumahAgama" class="hidden"><x-public.empty-state title="Grafik belum tersedia" message="Belum ada data rumah ibadah per agama yang dapat ditampilkan." /></div>
+                </div>
+                <div class="card-premium-static p-7">
+                    <h3 class="text-lg font-extrabold text-slate-900">Rumah Ibadah per Kecamatan</h3>
+                    <canvas id="chartRumahKecamatan" class="mt-6 h-80"></canvas>
+                    <div id="emptyRumahKecamatan" class="hidden"><x-public.empty-state title="Grafik belum tersedia" message="Belum ada data rumah ibadah per kecamatan yang dapat ditampilkan." /></div>
+                </div>
+                <div class="card-premium-static p-7 lg:col-span-2">
+                    <h3 class="text-lg font-extrabold text-slate-900">Sekolah Keagamaan per Agama</h3>
+                    <canvas id="chartSekolahAgama" class="mt-6 h-80"></canvas>
+                    <div id="emptySekolahAgama" class="hidden"><x-public.empty-state title="Grafik belum tersedia" message="Belum ada data sekolah keagamaan per agama yang dapat ditampilkan." /></div>
+                </div>
             </div>
         </div>
+    </section>
 
-        <div class="mt-12 rounded-3xl bg-white p-8 shadow-sm" data-aos="fade-up">
-            <h3 class="text-xl font-bold text-slate-900">Grafik Informasi</h3>
-            <p class="mt-2 text-sm text-slate-600">
-                Grafik detail dapat dikembangkan setelah data rumah ibadah, data umat, dan pendidikan keagamaan sudah terverifikasi.
-            </p>
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            const chartData = @json($charts);
+            const palette = ['#2f6b3f', '#0f5f7a', '#d6a63a', '#64748b', '#16a34a', '#0891b2', '#a16207'];
 
-            <div class="mt-8 h-72 rounded-2xl bg-slate-50 p-6">
-                <canvas id="chartStatistik"></canvas>
-            </div>
-        </div>
-    </div>
-</section>
-@endsection
+            function renderChart(canvasId, emptyId, source, type = 'bar') {
+                const canvas = document.getElementById(canvasId);
+                const empty = document.getElementById(emptyId);
+                if (!canvas || !window.Chart || !source?.labels?.length) {
+                    if (canvas) canvas.classList.add('hidden');
+                    if (empty) empty.classList.remove('hidden');
+                    return;
+                }
 
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const ctx = document.getElementById('chartStatistik');
+                new Chart(canvas, {
+                    type,
+                    data: {
+                        labels: source.labels,
+                        datasets: [{ data: source.values, backgroundColor: palette, borderRadius: 12 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: type === 'doughnut' } }, scales: type === 'bar' ? { y: { beginAtZero: true, ticks: { precision: 0 } } } : {} }
+                });
+            }
 
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Rumah Ibadah', 'Pendidikan', 'Berita', 'Kecamatan'],
-            datasets: [{
-                label: 'Ringkasan Data',
-                data: [
-                    {{ $stats['rumah_ibadah'] ?? 0 }},
-                    {{ $stats['sekolah_keagamaan'] ?? 0 }},
-                    {{ $stats['berita'] ?? 0 }},
-                    {{ $stats['kecamatan'] ?? 0 }}
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-        }
-    });
-</script>
-@endpush
+            renderChart('chartRumahAgama', 'emptyRumahAgama', chartData.rumahIbadahPerAgama, 'doughnut');
+            renderChart('chartRumahKecamatan', 'emptyRumahKecamatan', chartData.rumahIbadahPerKecamatan);
+            renderChart('chartSekolahAgama', 'emptySekolahAgama', chartData.sekolahPerAgama);
+        </script>
+    @endpush
+</x-layouts.public>
